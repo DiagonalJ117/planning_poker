@@ -17,8 +17,7 @@ const getRooms = async (req: Request, res: Response) => {
 };
 
 const getRoom = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  console.log(id);
+  const { id, name } = req.params;
   const room = await prisma.room.findFirst({
     where:{
       id: id
@@ -26,6 +25,16 @@ const getRoom = async (req: Request, res: Response) => {
   })
   res.json(room);
 };
+
+const getRoomByName = async (req: Request, res: Response) => {
+  const { name } = req.params;
+  const room = await prisma.room.findFirst({
+    where:{
+      name: name
+    }
+  })
+  res.json(room);
+}
 
 const deleteRoom = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -51,4 +60,4 @@ const updateRoom = async (req: Request, res: Response) => {
   res.json(room);
 };
 
-export default { createRoom, getRooms, getRoom, deleteRoom, updateRoom };
+export default { createRoom, getRooms, getRoom, deleteRoom, updateRoom, getRoomByName };

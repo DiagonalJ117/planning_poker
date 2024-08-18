@@ -13,11 +13,11 @@ const getRoomList = async () => {
   }
 }
 
-const getRoom = async (id: string) => {
+const getRoom = async (id?: string | null, name?: string) => {
   try {
     const response = await doRequest({
       method: 'GET',
-      url: `api/room/${id}`,
+      url: `api/room/${id || name}`,
     })
     return response
   } catch (error) {
@@ -26,8 +26,29 @@ const getRoom = async (id: string) => {
   }
 }
 
-const createRoom = async (name: string) => {
+const getRoomByName = async (name: string) => {
   try {
+    const response = await doRequest({
+      method: 'GET',
+      url: `api/room/getByName/${name}`,
+    })
+    return response
+  }
+  catch (error) {
+    console.error(error)
+    throw error;
+  }
+}
+
+const createRoom = async (name: string) => {
+
+  // Check if room with name already exists
+
+  try {
+    const doesRoomExist = await getRoomByName(name)
+    if (doesRoomExist) {
+      throw new Error('Room already exists')
+    }
     const response = await doRequest({
       method: 'POST',
       url: 'api/room/create',

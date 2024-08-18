@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { socket } from '@/socket'
 import useSessionStorage from '@/utils/useSessionStorage'
 import { getRoom } from '@/api/services/roomService'
@@ -33,6 +33,7 @@ const Room = () => {
   const [currentUser, setCurrentUser] = React.useState(username || null)
   const [vote, setVote] = React.useState('')
   const { id } = useParams();
+  const navigate = useNavigate()
 
   const getRoomData = async () => {
     try {
@@ -45,9 +46,21 @@ const Room = () => {
     }
   }
 
-  useEffect(() => {
-    getRoomData()
+  const checkUserLoginToRoom = () => {
+    socket.emit('joinRoom', { userName: currentUser, roomId: id, roomName: roomName }, error => {
+      if (error) {
+        console.error(error)
+        navigate(-1)
+        return false
+      }
+    })
 
+    return true;
+  }
+
+  useEffect(() => {
+
+    
     socket.connect();
 
     socket.on('connect', () => {
@@ -58,6 +71,12 @@ const Room = () => {
     if(!currentUser) {
       setCurrentUser(username)
     }
+
+
+      getRoomData()
+
+
+      checkUserLoginToRoom()
 
     return () => {
       socket.disconnect()

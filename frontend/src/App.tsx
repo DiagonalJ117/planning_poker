@@ -21,7 +21,7 @@ function App() {
           <Route path="/create-room" element={<CreateRoom />} />
           <Route path="/join-room" element={<JoinRoom />} />
           <Route path="/room-list" element={<RoomList />} />
-          <Route path="/about" element={<Settings />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>
     </Router>

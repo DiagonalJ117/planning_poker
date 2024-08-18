@@ -1,8 +1,6 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import './App.css'
-import { BrowserRouter as Router, Route, Routes, useParams } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes} from 'react-router-dom'
 import Room from './screens/Room'
 import Home from './screens/Home'
 import Settings from './screens/Settings'

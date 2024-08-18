@@ -8,7 +8,7 @@ const RoomList = () => {
   const navigate = useNavigate()
   const [rooms, setRooms] = React.useState([])
 
-  const RoomListItem = ({ name, participants, handleJoinRoom }: { name: string, participants: number }) => {
+  const RoomListItem = ({ name, participants, handleJoinRoom }: { name: string, participants: number, handleJoinRoom: () => void }) => {
     return (
       <div className="bg-card rounded-lg p-4 flex items-center justify-between">
         <div>

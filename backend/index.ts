@@ -4,7 +4,7 @@ import cors from 'cors';
 import { Server } from 'socket.io';
 import { PrismaClient } from '@prisma/client';
 import roomRoutes from './routes/room.routes';
-import { addUser, deleteUser, getUsersInRoom } from './users';
+import { addUser, deleteUser, getUser, getUsersInRoom } from './users';
 
 const app = express();
 const PORT = 4000;
@@ -51,14 +51,22 @@ async function main() {
         return callback(error);
       }
       socket.in(roomId).emit('notification', `${user?.name} joined the room`);
-      io.in(roomId).emit('users', getUsersInRoom(roomId));
+      io.in(roomId).emit('usersInRoom', getUsersInRoom(roomId));
       console.log('users in room', getUsersInRoom(roomId));
       console.log(`user ${user?.name} joined room ${user?.room}. Id: ${roomId}`);
     });
   
     socket.on('vote', (message) => {
+      const user = getUser(socket.id);
       console.log(message);
-      io.emit('message', message);
+      if(user) {
+        io.in(user?.room).emit('estimate', { user: user?.name, vote: message.vote });
+      }
+
+    });
+
+    socket.on('revealVotes', ({roomId, areVotesRevealed}) => {
+      io.in(roomId).emit('revealVotes',{ areVotesRevealed: areVotesRevealed ? true : false});
     });
   
     socket.on('disconnect', () => {
@@ -66,7 +74,7 @@ async function main() {
       const user = deleteUser(socket.id);
       if (user) {
         io.in(user.room).emit('notification', `${user.name} left the room`);
-        io.in(user.room).emit('users', getUsersInRoom(user.room));
+        io.in(user.room).emit('usersInRoom', getUsersInRoom(user.room));
         console.log(`user ${user.name} left room ${user.room}`);
       }
     });

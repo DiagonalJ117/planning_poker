@@ -7,7 +7,7 @@ interface IUser {
 const users: IUser[] = []
 
 const addUser = ({id, name, room} : IUser) => {
-  const existingUser = users.find(user => user.name.trim().toLowerCase() === name.trim().toLowerCase())
+  const existingUser = users?.find(user => user.name.trim().toLowerCase() === name.trim().toLowerCase())
 
   const existingIdUserIndex = users.findIndex(user => user.id === id);
   if (existingIdUserIndex !== -1) {

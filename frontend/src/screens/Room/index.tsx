@@ -28,12 +28,34 @@ const voteOptions = ['1', '2', '3', '5', '8', '13', '21']
 const Room = () => {
   const [username, _] = useSessionStorage('username', '')
   const [showVotes, setShowVotes] = React.useState(false)
-  const [estimates, setEstimates] = React.useState<number[] | string[]>([])
+  const [estimates, setEstimates] = React.useState<UserVoteComponentProps[]>([])
   const [roomName, setRoomName] = React.useState('')
+  const [users, setUsers] = React.useState([])
   const [currentUser, setCurrentUser] = React.useState(username || null)
   const [vote, setVote] = React.useState('')
   const { id } = useParams();
   const navigate = useNavigate()
+
+  const setInitialUserEstimatesInRoom = (users: UserVoteComponentProps[]) => {
+    // check for existing users in estimates
+
+    const newUserEstimates = users.map(user => {
+      
+      // check if user has already voted
+      const userWithVote = estimates.find(est => est.name === user.name)
+      
+
+      if (!userWithVote) {
+        return { name: user.name, vote: '-' }
+      }
+      return userWithVote
+    })
+
+    users.forEach((user: any) => {
+      console.log('setting user estimate', { name: user.name, vote: '-' })
+      setEstimates(newUserEstimates)
+    })
+  }
 
   const getRoomData = async () => {
     try {
@@ -45,6 +67,8 @@ const Room = () => {
       console.error(error)
     }
   }
+
+
 
   const checkUserLoginToRoom = () => {
     socket.emit('joinRoom', { userName: currentUser, roomId: id, roomName: roomName }, error => {
@@ -60,40 +84,82 @@ const Room = () => {
 
   useEffect(() => {
 
-    
-    socket.connect();
+    // check if user has username
+    if(username) {
+      socket.connect();
+      getRoomData().then(() => { 
+        checkUserLoginToRoom()
+      }).catch((error) => {
+        console.error(error)
+      })
+
+
+      if(!currentUser) {
+        setCurrentUser(username)
+      }
+
+      socket.on('usersInRoom', (users: any) => {
+        console.log('users in room', users)
+        if(users) {
+          setUsers(users)
+          console.log('setting initial estimates')
+          if(users.length <= 1 ) {
+            setInitialUserEstimatesInRoom(users)
+          }
+        }
+      })
+
+    } else {
+      navigate('/')
+    }
 
     socket.on('connect', () => {
       console.log('connected')
     })
 
-    
-    if(!currentUser) {
-      setCurrentUser(username)
-    }
-
-
-      getRoomData()
-
-
-      checkUserLoginToRoom()
-
     return () => {
       socket.disconnect()
       socket.on('disconnect', () => {
+        const estimatesWithRemovedUser = estimates.filter(est => est.name !== currentUser)
+        setEstimates(estimatesWithRemovedUser)
         console.log('disconnected')
       })
     }
     
   }, [])
 
+  useEffect(() => {
+    socket.on('estimate', (vote: any) => {
+      console.log('estimate', vote)
+      setEstimates(prevEstimates => {
+        const updatedEstimates = prevEstimates.map(est => {
+          if (est.name === vote.user) {
+            return { ...est, vote: vote.vote };
+          }
+          return est;
+        });
+        const existingUser = updatedEstimates.find(est => est.name === vote.user);
+        if (!existingUser) {
+          return [...updatedEstimates, { name: vote.user, vote: vote.vote }];
+        }
+        return updatedEstimates;
+      });
+      console.log('estimates', estimates)
+    })
+
+    socket.on('revealVotes', ({ areVotesRevealed}) => {
+      setShowVotes(areVotesRevealed ? false : true)
+    })
+  }, [socket])
+
   const handleRevealVotes = () => {
-    setShowVotes(!showVotes)
+    socket.emit('revealVotes', { roomId: id, areVotesRevealed: showVotes })
   }
 
   const handleVote = (children: string) => {
     setVote(children)
     socket.emit('vote', {user: currentUser, vote: children})
+    console.log('estimates', estimates) 
   }
 
 
@@ -131,7 +197,7 @@ const Room = () => {
           <h2 className="text-lg font-bold mb-4">Votes</h2>
           <div className="grid grid-cols-3 gap-4">
             {
-              userVotes.map(({ name, vote }) => (
+              estimates?.map(({ name, vote }) => (
                 <UserVoteComponent key={name} name={name} vote={vote} />
               ))
             }

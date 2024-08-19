@@ -31,6 +31,13 @@ const AppContext = React.createContext<AppContextType | undefined>(undefined);
 export const AppContextProvider: React.FC<AppContextProps> = ({ children }) => {
   const [username, setUsername] = useSessionStorage('username', '');
 
+  useEffect(() => {
+    const username = localStorage.getItem('username');
+    if (username !== null && username !== undefined && username !== '') {
+      setUsername(username);
+    }
+  }, [username, setUsername]);
+
   return <AppContext.Provider value={{username, setUsername}}>{children}</AppContext.Provider>;
 };
 

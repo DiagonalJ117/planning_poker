@@ -42,11 +42,10 @@ const Room = () => {
     const newUserEstimates = users.map(user => {
       
       // check if user has already voted
-      const userWithVote = estimates.find(est => est.name === user.name)
-      
+      const userWithVote = estimates.find(est => est.name === user.name && est.vote !== '-')
 
       if (!userWithVote) {
-        return { name: user.name, vote: '-' }
+        return { name: user.name, vote: user.vote }
       }
       return userWithVote
     })
@@ -149,6 +148,10 @@ const Room = () => {
 
     socket.on('revealVotes', ({ areVotesRevealed}) => {
       setShowVotes(areVotesRevealed ? false : true)
+    })
+
+    socket.on('usersInRoom', (users: any) => {
+      setInitialUserEstimatesInRoom(users)
     })
   }, [socket])
 

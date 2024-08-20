@@ -4,7 +4,7 @@ import cors from 'cors';
 import { Server } from 'socket.io';
 import { PrismaClient } from '@prisma/client';
 import roomRoutes from './routes/room.routes';
-import { addUser, deleteUser, getUser, getUsersInRoom } from './users';
+import { addUser, deleteUser, getUser, getUsersInRoom, updateUserVote } from './users';
 
 const app = express();
 const PORT = 4000;
@@ -60,6 +60,7 @@ async function main() {
       const user = getUser(socket.id);
       console.log(message);
       if(user) {
+        updateUserVote(socket.id, message.vote);
         io.in(user?.room).emit('estimate', { user: user?.name, vote: message.vote });
       }
 

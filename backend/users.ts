@@ -1,6 +1,7 @@
 interface IUser {
   id: string;
   name: string;
+  vote?: string;
   room: string;
 }
 
@@ -23,6 +24,13 @@ const addUser = ({id, name, room} : IUser) => {
   return { user }
 }
 
+const updateUserVote = (id: string, vote: string) => {
+  const user = users.find(user => user.id === id)
+  if (user) {
+    user.vote = vote
+  }
+}
+
 const getUser = (id: string) => users?.find(user => user.id === id)
 
 const deleteUser = (id: string) => {
@@ -32,4 +40,4 @@ const deleteUser = (id: string) => {
 
 const getUsersInRoom = (room: string) => users.filter(user => user.room === room)
 
-export { addUser, getUser, deleteUser, getUsersInRoom }
+export { addUser, getUser, deleteUser, getUsersInRoom, updateUserVote}

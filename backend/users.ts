@@ -1,9 +1,4 @@
-interface IUser {
-  id: string;
-  name: string;
-  vote?: string;
-  room: string;
-}
+import { IUser } from "./interfaces";
 
 const users: IUser[] = []
 

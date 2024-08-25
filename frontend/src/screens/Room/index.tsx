@@ -5,21 +5,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { socket } from '@/socket'
 import useSessionStorage from '@/utils/useSessionStorage'
 import { getRoom } from '@/api/services/roomService'
+import {  UserVoteComponentProps, VoteButtonProps } from '@/types'
+import TabularVoteSummary from '@/components/VoteSummary/TabularVoteSummary'
 
-type VoteButtonProps = {
-  children: string;
-}
-
-type UserVoteComponentProps = {
-  name: string;
-  vote: string;
-}
-
-const userVotes = [
-  { name: 'John Doe', vote: '5' },
-  { name: 'Jane Smith', vote: '8' },
-  { name: 'Bob Johnson', vote: '3' }
-]
 
 const voteOptions = ['1', '2', '3', '5', '8', '13', '21']
 
@@ -30,7 +18,7 @@ const Room = () => {
   const [showVotes, setShowVotes] = React.useState(false)
   const [estimates, setEstimates] = React.useState<UserVoteComponentProps[]>([])
   const [roomName, setRoomName] = React.useState('')
-  const [users, setUsers] = React.useState([])
+  const [users, setUsers] = React.useState<UserVoteComponentProps[]>([])
   const [currentUser, setCurrentUser] = React.useState(username || null)
   const [vote, setVote] = React.useState('')
   const { id } = useParams();
@@ -50,7 +38,7 @@ const Room = () => {
       return userWithVote
     })
 
-    users.forEach((user: any) => {
+    users.forEach((user: UserVoteComponentProps) => {
       console.log('setting user estimate', { name: user.name, vote: '-' })
       setEstimates(newUserEstimates)
     })
@@ -97,13 +85,13 @@ const Room = () => {
         setCurrentUser(username)
       }
 
-      socket.on('usersInRoom', (users: any) => {
+      socket.on('usersInRoom', (users: UserVoteComponentProps[]) => {
         console.log('users in room', users)
         if(users) {
           setUsers(users)
           console.log('setting initial estimates')
           if(users.length <= 1 ) {
-            setInitialUserEstimatesInRoom(users)
+            setInitialUserEstimatesInRoom(users as UserVoteComponentProps[])
           }
         }
       })
@@ -150,7 +138,7 @@ const Room = () => {
       setShowVotes(areVotesRevealed ? false : true)
     })
 
-    socket.on('usersInRoom', (users: any) => {
+    socket.on('usersInRoom', (users: UserVoteComponentProps[]) => {
       setInitialUserEstimatesInRoom(users)
     })
   }, [socket])
@@ -186,6 +174,8 @@ const Room = () => {
   return (
     <>
         <h1 className="mt = text-2xl font-bold mb-4">Room {roomName}</h1>
+        {showVotes &&  <TabularVoteSummary votes={estimates} />}
+
         <h2>{vote}</h2>
         <div className="grid grid-cols-7 gap-4">
 

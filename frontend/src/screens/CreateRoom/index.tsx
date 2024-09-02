@@ -1,4 +1,5 @@
 import { createRoom } from '@/api/services/roomService'
+import RoomSettingsPanel from '@/components/RoomSettingsPanel'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -32,14 +33,7 @@ const CreateRoom = () => {
 
   return (
     <div className='flex flex-col h-52 justify-between'>
-      <Input placeholder='Room Name' onChange={handleRoomNameChange}/>
-      <div className='flex flex-row items-center'>
-        <label htmlFor='isPrivate' className='mr-2'>Private</label>
-        <Checkbox checked={isPrivate} onCheckedChange={handleIsPrivateChange} id='isPrivate' className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70' />
-      </div>
-      {isPrivate && <Input type='password' placeholder='Password' />}
-
-      <Button onClick={handleCreateRoom}>Create Room</Button>
+      <RoomSettingsPanel />
     </div>
   )
 }

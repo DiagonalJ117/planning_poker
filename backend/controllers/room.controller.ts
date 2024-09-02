@@ -2,10 +2,14 @@ import { Request, Response } from "express";
 import { prisma } from "..";
 
 const createRoom = async (req: Request, res: Response) => {
-  const { name } = req.body;
+  const { name, votingSystem, isPrivate, password } = req.body;
+  console.log('req.body', req.body);
   const room = await prisma.room.create({
     data: {
       name,
+      votingSystem,
+      password,
+      isPrivate,
     },
   });
   res.json(room);
@@ -48,13 +52,16 @@ const deleteRoom = async (req: Request, res: Response) => {
 
 const updateRoom = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name } = req.body;
+  const { name, votingSystem, isPrivate, password } = req.body;
   const room = await prisma.room.update({
     where: {
       id: id,
     },
     data: {
       name,
+      votingSystem,
+      isPrivate,
+      password,
     },
   });
   res.json(room);

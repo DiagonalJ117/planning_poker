@@ -1,3 +1,4 @@
+import { CreateRoomInput } from "@/types"
 import doRequest from "../APIBase"
 
 const getRoomList = async () => {
@@ -40,19 +41,21 @@ const getRoomByName = async (name: string) => {
   }
 }
 
-const createRoom = async (name: string) => {
+const createRoom = async (data: CreateRoomInput) => {
+
+  const { roomName, votingSystem, isPrivate, password} = data;
 
   // Check if room with name already exists
 
   try {
-    const doesRoomExist = await getRoomByName(name)
+    const doesRoomExist = await getRoomByName(roomName)
     if (doesRoomExist) {
       throw new Error('Room already exists')
     }
     const response = await doRequest({
       method: 'POST',
       url: 'api/room/create',
-      data: { name: name },
+      data: { name: roomName, votingSystem, isPrivate, password },
     })
     return response
   } catch (error) {

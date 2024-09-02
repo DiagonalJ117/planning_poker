@@ -9,7 +9,6 @@ import {  UserVoteComponentProps, VoteButtonProps } from '@/types'
 import TabularVoteSummary from '@/components/VoteSummary/TabularVoteSummary'
 
 
-const voteOptions = ['1', '2', '3', '5', '8', '13', '21']
 
 
 
@@ -17,6 +16,7 @@ const Room = () => {
   const [username, _] = useSessionStorage('username', '')
   const [showVotes, setShowVotes] = React.useState(false)
   const [estimates, setEstimates] = React.useState<UserVoteComponentProps[]>([])
+  const [voteOptions, setVoteOptions] = React.useState<string[]>([])
   const [roomName, setRoomName] = React.useState('')
   const [users, setUsers] = React.useState<UserVoteComponentProps[]>([])
   const [currentUser, setCurrentUser] = React.useState(username || null)
@@ -44,12 +44,32 @@ const Room = () => {
     })
   }
 
+  const handleSetVoteOptions = (votingSystem: string) => {
+    const fibonacci = ['0', '1', '2', '3', '5', '8', '13', '21', '?']
+    const tshirtSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?']
+    const powersOfTwo = ['0', '1', '2', '4', '8', '16', '32', '64', '?']
+    switch (votingSystem) {
+      case 'fibonacci':
+        setVoteOptions(fibonacci)
+        break;
+      case 'tshirtSizes':
+        setVoteOptions(tshirtSizes)
+        break;
+      case 'powers':
+        setVoteOptions(powersOfTwo)
+        break;
+      default:
+        setVoteOptions(fibonacci)
+    }
+  }
+
   const getRoomData = async () => {
     try {
       const response = await getRoom(id || '')
       const data = await response
       console.log(data)
       setRoomName(data.name)
+      handleSetVoteOptions(data.votingSystem)
     } catch (error) {
       console.error(error)
     }
@@ -172,11 +192,11 @@ const Room = () => {
   )
 
   return (
-    <>
-        <h1 className="mt = text-2xl font-bold mb-4">Room {roomName}</h1>
+    <div className='m-5 flex flex-col justify-center items-center'>
+        <h1 className="mt = text-2xl font-bold mb-4 text-center">Room {roomName}</h1>
         {showVotes &&  <TabularVoteSummary votes={estimates} />}
 
-        <h2>{vote}</h2>
+        <h2 className='text-center my-5'>{vote}</h2>
         <div className="grid grid-cols-7 gap-4">
 
           {
@@ -188,7 +208,7 @@ const Room = () => {
         <Button onClick={handleRevealVotes} className="px-6 py-3 rounded-md text-lg font-medium">Reveal Votes</Button>
         <div className="bg-card p-6 rounded-md w-full max-w-md">
           <h2 className="text-lg font-bold mb-4">Votes</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className={`grid grid-cols-${estimates.length < 5 ? estimates.length : 5} gap-4`}>
             {
               estimates?.map(({ name, vote }) => (
                 <UserVoteComponent key={name} name={name} vote={vote} />
@@ -196,7 +216,7 @@ const Room = () => {
             }
           </div>
         </div>
-        </>
+        </div>
   )
 }
 

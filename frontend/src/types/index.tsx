@@ -13,3 +13,10 @@ export type IUser = {
   vote?: string;
   room: string;
 }
+
+export type CreateRoomInput = {
+  roomName: string;
+  votingSystem: string;
+  isPrivate: boolean;
+  password?: string;
+}

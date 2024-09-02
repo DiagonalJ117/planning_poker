@@ -17,6 +17,9 @@ model Room {
   id        String   @id @default(cuid())
   name      String
   password  String?
+  votingSystem String @default("fibonacci")
+  isPrivate Boolean @default(false)
+  config    Json     @default("{}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   messages  Message[]

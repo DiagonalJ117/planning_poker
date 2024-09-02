@@ -12,7 +12,7 @@ import { UserVoteComponentProps } from '@/types'
 
 const TabularVoteSummary = ({votes}: {votes: UserVoteComponentProps[]}) => {
   const groupedVotes = votes.reduce((acc, vote) => {
-    const key = vote?.vote?.toString()
+    const key = vote?.vote ? vote?.vote.toString() : '-'
     if (!acc[key]) {
       acc[key] = []
     }
@@ -40,7 +40,7 @@ const TabularVoteSummary = ({votes}: {votes: UserVoteComponentProps[]}) => {
         <TableBody>
           {sortedVoteGroups.map(([vote, voters]) => (
             <TableRow key={vote}>
-              <TableCell className="font-medium">{vote}</TableCell>
+              <TableCell className="font-medium">{ vote }</TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-2">
                   {voters.map((voter, index) => (

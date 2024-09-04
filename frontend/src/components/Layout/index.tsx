@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 import Header from './Header'
 import { useLocation } from 'react-router-dom'
 import UsernameDialog from '../UsernameDialog'
-import useSessionStorage from '@/utils/useSessionStorage'
 import { useAppContext } from '@/context/appContext'
 
 const Layout = ({ children }: {children: React.ReactNode}) => {
